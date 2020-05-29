@@ -150,7 +150,7 @@ class Homepage extends Component{
                    
                    <div className={classes.form}>
                         <form onSubmit={this.sumbithandler}>
-                            <label>Your Name</label>
+                            <label style={{color:'firebrick'}}>Your Name</label>
                             <br/>
                             <input type='text' value={this.state.title} required maxLength='20' onChange={(e)=>{
                                 this.setState({
