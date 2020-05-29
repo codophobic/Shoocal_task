@@ -1,9 +1,32 @@
 import React, { Component } from 'react';
 import classes from './homepage.module.css';
-import TextInput from './ui/textfield';
+import ArrowDropUpOutlinedIcon from '@material-ui/icons/ArrowDropUpOutlined';
 import axios from 'axios';
+import ArrowDropDownOutlinedIcon from '@material-ui/icons/ArrowDropDownOutlined';
 class Homepage extends Component{
 
+   state={
+        title:'',
+        description:'',
+        comments:[],
+        reloadData:1
+    }
+   
+    componentDidUpdate=(prevprops,prevstate)=>{
+          if(prevstate.reloadData!==this.state.reloadData)
+          {
+            axios.get('/comment/commentdata').then(res=>{
+                console.log(res.data);
+                let dArray= res.data;
+                this.setState({
+                    ...this.state,
+                    comments:dArray
+                });
+    
+                console.log(this.state);
+            });
+          }
+    }
 
     componentDidMount=()=>{
         axios.get('/comment/commentdata').then(res=>{
@@ -16,11 +39,7 @@ class Homepage extends Component{
             console.log(this.state);
         });
     }
-    state={
-        title:'',
-        description:'',
-        comments:[]
-    }
+   
    sumbithandler=(e)=>{
        e.preventDefault();
        console.log(this.state);
@@ -39,29 +58,69 @@ class Homepage extends Component{
        this.setState({
            ...this.state,
            title:'',
-        description:''
+        description:'',
+        reloadData:(this.state.reloadData===1?0:1)
        })
    }
+    
+   upvotehandler=(id)=>{
 
+       let dArray= this.state.comments;
+       for(let i=0;i<dArray.length;i++)
+       {
+           if(dArray[i]._id===id)
+           {
+               
+               dArray[i].upvotes+=1;
+           }
+       }
+
+       this.setState({
+           ...this.state,
+           comments:dArray
+       })
+
+       console.log(this.state);
+   }
+
+   downvotehandler=(id)=>{
+    let dArray= this.state.comments;
+
+    for(let i=0;i<dArray.length;i++)
+    {
+        if(dArray[i]._id===id)
+        {
+            dArray[i].downvotes+=1;
+        }
+    }
+
+    this.setState({
+        ...this.state,
+        comments:dArray
+    })
+   }
       
 
     render()
     {
         const allcmts= this.state.comments.map(el=>{
             return(
-                <div className="row" key={el._id}>
-                <div className="col-sm-6 col-md-8 col-lg-8">
-                  <div className="card">
-                    <div className="card-body">
-                      <h5 className="card-title">{el.title}</h5>
-                      <p className="card-text">{el.description}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className='col-sm-3 col-md-2 col-lg-2'></div>
-                <div className="col-sm-3 col-md-2 col-lg-2">
-                  
-                </div>
+              <div className='row block-margin' style={{border:'2px solid black',marginBottom:'15px',marginLeft:'195px',display:'inline-block',width:'70%'}}>
+              <div className='col-sm-6 col-md-8 col-lg-8'>
+                 <div style={{marginLeft:'30px',color:'red',fontSize:'24px',fontWeight:'500'}}>{el.title}</div>
+                 <br/>
+                 <div style={{marginLeft:'30px',color:'blue',fontSize:'15px',fontWeight:'300'}}>{el.description}</div>
+              </div>
+               <div className='col-sm-3 col-md-2 col-lg-2'></div>
+               <div className='col-sm-3 col-md-2 col-lg-2'>
+                   <div style={{marginTop:'20px'}}>
+                       <ArrowDropUpOutlinedIcon onClick={()=>{this.upvotehandler(el._id)}}className={classes.vote} style={{transform:'scale(2.8)',color:'disabled'}} />
+                         <p>{el.upvotes} upvotes</p>
+                       
+                       <ArrowDropDownOutlinedIcon onClick={()=>{this.downvotehandler(el._id)}} className={classes.vote} style={{transform:'scale(2.8)',color:'disabled'}}/>
+                       <p>{el.downvotes} downvotes</p>
+                   </div>
+               </div>
               </div>
             )
         })
