@@ -18,6 +18,7 @@ class Homepage extends Component{
             axios.get('/comment/commentdata').then(res=>{
                 console.log(res.data);
                 let dArray= res.data;
+                dArray.reverse();
                 this.setState({
                     ...this.state,
                     comments:dArray
@@ -31,9 +32,11 @@ class Homepage extends Component{
     componentDidMount=()=>{
         axios.get('/comment/commentdata').then(res=>{
             console.log(res.data);
+            let dArray=res.data;
+            dArray.reverse();
             this.setState({
                 ...this.state,
-                comments:res.data
+                comments:dArray
             });
 
             console.log(this.state);
@@ -80,6 +83,12 @@ class Homepage extends Component{
            comments:dArray
        })
 
+       axios.post('/comment/upvote',{id:id}).then(res=>{
+       console.log('upvote succesful');
+       }).catch(err=>{
+           console.log(err);
+       })
+
        console.log(this.state);
    }
 
@@ -87,17 +96,24 @@ class Homepage extends Component{
     let dArray= this.state.comments;
 
     for(let i=0;i<dArray.length;i++)
-    {
-        if(dArray[i]._id===id)
         {
-            dArray[i].downvotes+=1;
+            if(dArray[i]._id===id)
+            {
+                dArray[i].downvotes+=1;
+            }
         }
-    }
+    
+        this.setState({
+            ...this.state,
+            comments:dArray
+        });
 
-    this.setState({
-        ...this.state,
-        comments:dArray
+    axios.post('/comment/downvote',{id:id}).then(res=>{
+       console.log('downvote succesful');
+    }).catch(err=>{
+      console.log(err);
     })
+
    }
       
 
@@ -105,19 +121,19 @@ class Homepage extends Component{
     {
         const allcmts= this.state.comments.map(el=>{
             return(
-              <div className='row block-margin' style={{border:'2px solid black',marginBottom:'15px',marginLeft:'195px',display:'inline-block',width:'70%'}}>
+              <div className='row block-margin' style={{border:'2px solid black',marginBottom:'15px',marginLeft:'195px',display:'inline-block',width:'70%',background:'lightgray'}}>
               <div className='col-sm-6 col-md-8 col-lg-8'>
                  <div style={{marginLeft:'30px',color:'red',fontSize:'24px',fontWeight:'500'}}>{el.title}</div>
-                 <br/>
+                 <hr/>
                  <div style={{marginLeft:'30px',color:'blue',fontSize:'15px',fontWeight:'300'}}>{el.description}</div>
               </div>
                <div className='col-sm-3 col-md-2 col-lg-2'></div>
                <div className='col-sm-3 col-md-2 col-lg-2'>
                    <div style={{marginTop:'20px'}}>
-                       <ArrowDropUpOutlinedIcon onClick={()=>{this.upvotehandler(el._id)}}className={classes.vote} style={{transform:'scale(2.8)',color:'disabled'}} />
+                       <ArrowDropUpOutlinedIcon onClick={()=>{this.upvotehandler(el._id)}} className={classes.upvote} style={{transform:'scale(2.8)',color:'disabled'}} />
                          <p>{el.upvotes} upvotes</p>
                        
-                       <ArrowDropDownOutlinedIcon onClick={()=>{this.downvotehandler(el._id)}} className={classes.vote} style={{transform:'scale(2.8)',color:'disabled'}}/>
+                       <ArrowDropDownOutlinedIcon onClick={()=>{this.downvotehandler(el._id)}} className={classes.downvote} style={{transform:'scale(2.8)',color:'disabled'}}/>
                        <p>{el.downvotes} downvotes</p>
                    </div>
                </div>

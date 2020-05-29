@@ -24,7 +24,11 @@
     margin-right: 20px;
 }
 
-.vote:hover{
-color:red;
+.upvote:hover{
+color:green;
 cursor: pointer;
 }
+.downvote:hover{
+    color:red;
+    cursor: pointer;
+    }

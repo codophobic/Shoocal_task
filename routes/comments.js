@@ -32,7 +32,29 @@ router.get('/commentdata',async(req,res)=>{
   } catch (err) {
     res.status(500).send(err);
   }
-})
+});
+
+router.post('/upvote',async(req,res)=>{
+  let id= req.body.id;
+
+  await Commentmodel.findOne({_id:id}).then(doc=>{
+    let x= doc.upvotes;
+    x++;
+    doc.upvotes=x;
+     doc.save();
+  })
+});
+
+router.post('/downvote',async(req,res)=>{
+  let id= req.body.id;
+
+  await Commentmodel.findOne({_id:id}).then(doc=>{
+    let x= doc.downvotes;
+    x++;
+    doc.downvotes=x;
+    doc.save();
+  })
+});
 
 
 module.exports= router;
